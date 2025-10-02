@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placement Prediction System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Arial', sans-serif;
+        }
+        .container {
+            max-width: 600px;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+        .card-header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            text-align: center;
+            padding: 20px;
+        }
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 12px;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .btn-secondary {
+            background: linear-gradient(45deg, #6c757d, #495057);
+            border: none;
+            border-radius: 10px;
+            padding: 8px 20px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-left: 10px;
+        }
+        .btn-secondary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+        .feature-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .api-demo {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .loading {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="mb-0">🎓 Placement Prediction System</h1>
+                <p class="mb-0">Enter your scores to predict placement probability</p>
+            </div>
+            <div class="card-body p-4">
+                
+                <!-- Information Section -->
+                <div class="feature-info">
+                    <h6><i class="fas fa-info-circle"></i> <strong>Score Guidelines:</strong></h6>
+                    <ul class="mb-0 small">
+                        <li><strong>Mock HR, GD, Presentation:</strong> Score out of 20 (5-20)</li>
+                        <li><strong>English CEFR Level:</strong> 0=A1, 1=A2, 2=B1, 3=B2/C1</li>
+                        <li><strong>English Score:</strong> Score out of 20 (5-20)</li>
+                    </ul>
+                </div>
+
+                <!-- Prediction Form -->
+                <form method="POST" action="/predict" id="predictionForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="mock_hr" class="form-label"><strong>Mock HR Interview Score</strong></label>
+                            <input type="number" class="form-control" id="mock_hr" name="mock_hr" 
+                                   min="5" max="20" step="0.1" required 
+                                   placeholder="Enter score (5-20)">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="gd" class="form-label"><strong>Group Discussion Score</strong></label>
+                            <input type="number" class="form-control" id="gd" name="gd" 
+                                   min="4" max="20" step="0.1" required 
+                                   placeholder="Enter score (4-20)">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="presentation" class="form-label"><strong>Presentation Score</strong></label>
+                            <input type="number" class="form-control" id="presentation" name="presentation" 
+                                   min="5" max="20" step="0.1" required 
+                                   placeholder="Enter score (5-20)">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="english_cefr" class="form-label"><strong>English CEFR Level</strong></label>
+                            <select class="form-control" id="english_cefr" name="english_cefr" required>
+                                <option value="">Select Level</option>
+                                <option value="0">A1 (Beginner)</option>
+                                <option value="1">A2 (Elementary)</option>
+                                <option value="2">B1 (Intermediate)</option>
+                                <option value="3">B2/C1 (Advanced)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="english_score" class="form-label"><strong>English Score</strong></label>
+                        <input type="number" class="form-control" id="english_score" name="english_score" 
+                               min="5" max="20" step="0.1" required 
+                               placeholder="Enter score (5-20)">
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                            <i class="fas fa-chart-line"></i> Predict Placement
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="tryAPI()">
+                            <i class="fas fa-code"></i> Try API
+                        </button>
+                        <div class="loading mt-2">
+                            <i class="fas fa-spinner fa-spin"></i> Processing...
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Results Section -->
+                {% if show_result %}
+                <div class="mt-4">
+                    <div class="alert alert-{{ result_class }} text-center">
+                        <h4><i class="fas fa-{{ 'check-circle' if result_class == 'success' else 'exclamation-triangle' }}"></i></h4>
+                        <h5><strong>{{ prediction }}</strong></h5>
+                        <p class="mb-0">Confidence: {{ confidence }}</p>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Error Section -->
+                {% if error %}
+                <div class="mt-4">
+                    <div class="alert alert-danger text-center">
+                        <h5><i class="fas fa-exclamation-triangle"></i> {{ error }}</h5>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+        
+        
+        <!-- Footer -->
+        <div class="text-center mt-4">
+            <p class="text-white-50">
+                <small>Made by Abhiraj & Alok</small>
+            </p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // API demo function
+        async function tryAPI() {
+            const formData = new FormData(document.getElementById('predictionForm'));
+            const data = {
+                mock_hr: parseFloat(formData.get('mock_hr')),
+                gd: parseFloat(formData.get('gd')),
+                presentation: parseFloat(formData.get('presentation')),
+                english_cefr: parseInt(formData.get('english_cefr')),
+                english_score: parseFloat(formData.get('english_score'))
+            };
+
+            // Validate form
+            if (!data.mock_hr || !data.gd || !data.presentation || 
+                data.english_cefr === null || !data.english_score) {
+                alert('Please fill all fields before trying API');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                
+                document.getElementById('apiResult').style.display = 'block';
+                document.getElementById('apiResult').innerHTML = `
+                    <div class="alert alert-info">
+                        <strong>API Response:</strong><br>
+                        <pre>${JSON.stringify(result, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('apiResult').style.display = 'block';
+                document.getElementById('apiResult').innerHTML = `
+                    <div class="alert alert-danger">
+                        <strong>API Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Form submission loading state
+        document.getElementById('predictionForm').addEventListener('submit', function() {
+            document.querySelector('.loading').style.display = 'block';
+            document.getElementById('submitBtn').disabled = true;
+        });
+    </script>
+</body>
+</html>
