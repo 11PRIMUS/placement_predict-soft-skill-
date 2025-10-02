@@ -12,10 +12,23 @@ import os
 
 app = FastAPI(title="Placement Prediction System", description="Predict student placement based on soft skills scores")
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates=Jinja2Templates(directory="templates")
-#prediction model added
-model=joblib.load('placement_model.pkl')
+# Mount static files only if directory exists
+try:
+    import os
+    if os.path.exists("static"):
+        app.mount("/static", StaticFiles(directory="static"), name="static")
+except Exception as e:
+    print(f"Static files not mounted: {e}")
+
+templates = Jinja2Templates(directory="templates")
+
+# Load prediction model with error handling
+try:
+    model = joblib.load('placement_model.pkl')
+    print("Model loaded successfully")
+except Exception as e:
+    print(f"Error loading model: {e}")
+    model = None
 
 class PredictionRequest(BaseModel):
     mock_hr: float
@@ -32,6 +45,15 @@ class PredictionResponse(BaseModel):
     success: bool
     error: Optional[str] = None
 
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for monitoring"""
+    return {
+        "status": "healthy",
+        "model_loaded": model is not None,
+        "message": "Placement Prediction API is running"
+    }
+
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
@@ -46,7 +68,10 @@ async def predict_form(
     english_score: float = Form(...)
 ):
     try:
-        features =np.array([[mock_hr, gd, presentation, english_cefr, english_score]])
+        if model is None:
+            raise Exception("Model not loaded")
+        
+        features = np.array([[mock_hr, gd, presentation, english_cefr, english_score]])
         
         #make prediction
         prediction =model.predict(features)[0]
@@ -80,6 +105,9 @@ async def predict_form(
 @app.post("/api/predict", response_model=PredictionResponse)
 async def predict_api(prediction_request: PredictionRequest):
     try:
+        if model is None:
+            raise Exception("Model not loaded")
+            
         features = np.array([[
             prediction_request.mock_hr, 
             prediction_request.gd, 
