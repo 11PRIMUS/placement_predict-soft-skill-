@@ -47,7 +47,6 @@ class PredictionResponse(BaseModel):
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint for monitoring"""
     return {
         "status": "healthy",
         "model_loaded": model is not None,
