@@ -12,19 +12,18 @@ import os
 
 app = FastAPI(title="Placement Prediction System", description="Predict student placement based on soft skills scores")
 
-# Mount static files only if directory exists
 try:
     import os
     if os.path.exists("static"):
-        app.mount("/static", StaticFiles(directory="static"), name="static")
+        app.mount("/static",StaticFiles(directory="static"), name="static")
 except Exception as e:
     print(f"Static files not mounted: {e}")
 
 templates = Jinja2Templates(directory="templates")
 
-# Load prediction model with error handling
+#prediction model
 try:
-    model = joblib.load('placement_model.pkl')
+    model = joblib.load('model/p2.pkl')
     print("Model loaded successfully")
 except Exception as e:
     print(f"Error loading model: {e}")
@@ -70,11 +69,12 @@ async def predict_form(
         if model is None:
             raise Exception("Model not loaded")
         
-        features = np.array([[mock_hr, gd, presentation, english_cefr, english_score]])
+        features = pd.DataFrame([[mock_hr, gd, presentation, english_cefr, english_score]], 
+                              columns=['Mock HR', 'GD', 'Presentation', 'English CEFR', 'English Score'])
         
         #make prediction
-        prediction =model.predict(features)[0]
-        probability =model.predict_proba(features)[0]
+        prediction = model.predict(features)[0]
+        probability = model.predict_proba(features)[0]
         
         #confidenece percentage
         confidence =max(probability) * 100
@@ -142,7 +142,7 @@ async def predict_api(prediction_request: PredictionRequest):
             error=f"Error: {str(e)}"
         )
 
-if __name__ == "__main__":
+if __name__=="__main__":
     port = int(os.getenv("PORT", 8000))
     host = os.getenv("HOST", "0.0.0.0")
     
