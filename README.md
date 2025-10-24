@@ -3,7 +3,7 @@
 A modern FastAPI web application that predicts student placement probability based on their soft skills scores.
 
 ## 🚀 Live Demo
-**Deployed on Render:** [Your App URL will be here after deployment]
+**Deployed on Render:** [https://placement-softv2.onrender.com]
 
 ## Features
 - User-friendly web interface with Bootstrap styling
@@ -31,24 +31,7 @@ pip install -r requirements.txt
 python app.py
 
 # Access at: http://localhost:8000
-```
-
-## API Endpoints:
-
-- `GET /` - Web interface
-- `POST /predict` - Form-based prediction (HTML response)
-- `POST /api/predict` - JSON-based prediction (JSON response)
-- `GET /docs` - Interactive API documentation
-
-## Deploy to Render.com:
-
-1. **Fork/Upload** this repository to GitHub
-2. **Connect** to [Render.com](https://render.com)
-3. **Create New Web Service** with these settings:
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `uvicorn app:app --host 0.0.0.0 --port $PORT`
-4. **Deploy** and get your live URL!
-
+``
 ## Project Structure:
 ```
 ├── app.py                    # Main FastAPI application
