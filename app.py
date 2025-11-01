@@ -23,7 +23,7 @@ templates = Jinja2Templates(directory="templates")
 
 #prediction model
 try:
-    model = joblib.load('model/p2.pkl')
+    model = joblib.load('model/p3.pkl')
     print("Model loaded successfully")
 except Exception as e:
     print(f"Error loading model: {e}")
@@ -69,10 +69,21 @@ async def predict_form(
         if model is None:
             raise Exception("Model not loaded")
         
-        features = pd.DataFrame([[mock_hr, gd, presentation, english_cefr, english_score]], 
-                              columns=['Mock HR', 'GD', 'Presentation', 'English CEFR', 'English Score'])
-        
-        #make prediction
+        #feature frame with add ons
+        features = pd.DataFrame([
+            [mock_hr, gd, presentation, english_cefr, english_score]
+        ], columns=['Mock HR', 'GD', 'Presentation', 'English CEFR', 'English Score'])
+
+        features['HR_GD_interaction'] = features['Mock HR'] * features['GD']
+        features['English_Total'] = features['English CEFR'] * features['English Score']
+        features['Overall_Performance'] = features[['Mock HR', 'GD', 'Presentation']].mean(axis=1)
+
+        features = features[[
+            'Mock HR', 'GD', 'Presentation', 'English CEFR', 'English Score',
+            'HR_GD_interaction', 'English_Total', 'Overall_Performance'
+        ]]
+
+        # make prediction
         prediction = model.predict(features)[0]
         probability = model.predict_proba(features)[0]
         
