@@ -16,9 +16,9 @@ A modern FastAPI web application that predicts student placement probability bas
 
 ## Required Input Scores:
 1. **Mock HR Interview Score** (5-20)
-2. **Group Discussion Score** (4-20) 
+2. **Group Discussion Score** (5-20) 
 3. **Presentation Score** (5-20)
-4. **English CEFR Level** (0=A1, 1=A2, 2=B1, 3=B2/C1)
+4. **English CEFR Level** (1=A1, 2=A2, 3=B1, 4=B2, 5=C1, 6=C2)
 5. **English Score** (5-20)
 
 ## Local Development:
